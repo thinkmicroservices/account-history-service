@@ -1,0 +1,51 @@
+ 
+server:
+  port: 8080
+
+spring:
+  
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+      
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+ 
+  cloud:
+    stream:
+      bindings:
+        input:
+          destination: AccountEvents
+          group: accountHistoryGroup ## https://docs.spring.io/spring-cloud-stream/docs/current/reference/htmlsingle/#consumer-groups
+          
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: mongo
+      repositories:
+        enable: true
+        
+        
+management:
+  endpoints:
+    metrics:
+      sensitive: false
+    web:
+      exposure:
+        include: info,health,prometheus
+        
+management.metrics.tags.application: ${spring.application.name} 
+        
+jwt.secret: 7h1nkm1cr053rv1c35
+
+
+
+spring.jpa.show-sql: true
+spring.jpa.properties.hibernate.format_sql: true
+logging.level.org.hibernate.SQL: DEBUG
+logging.level.org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+logging.level.org.springframework.data.mongodb.core.MongoTemplate: DEBUG
