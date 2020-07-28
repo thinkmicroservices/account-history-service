@@ -1,15 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+ 
 package com.thinkmicroservices.ri.spring.account.history.controller;
 
+import com.thinkmicroservices.ri.spring.account.history.jwt.JWTService;
 import com.thinkmicroservices.ri.spring.account.history.model.PagedEventHistoryRequest;
 import com.thinkmicroservices.ri.spring.account.history.model.PagedEventHistoryResponse;
 import com.thinkmicroservices.ri.spring.account.history.service.AccountHistoryService;
-import com.thinkmicroservices.ri.spring.account.history.service.JWT;
-import com.thinkmicroservices.ri.spring.account.history.service.JWTService;
+ 
 import com.thinkmicroservices.ri.spring.account.history.service.UtilityService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -20,9 +16,7 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Api(value = "Account History Management System", description = "Operations pertaining to account history")
 @RestController
-//@CrossOrigin
+ 
 @Slf4j
 public class AccountHistoryController {
 
@@ -58,16 +52,10 @@ public class AccountHistoryController {
                 required = true, dataType = "string", paramType = "header")})
     public ResponseEntity<?> getPagedHistory(@RequestParam Integer pageNo, @RequestParam Integer pageSize, @RequestParam String sortBy, HttpServletRequest httpServletRequest) {
         log.info("get history request");
-        JWT jwt = jwtService.getJWT(httpServletRequest);
-
-        if (jwt == null) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-        if ((jwt.hasRole(JWT.ROLE_USER)) || (jwt.hasRole(JWT.ROLE_ADMIN))) {
+     
             return ResponseEntity.ok(accountHistoryService.findAll(pageNo, pageSize, sortBy));
 
-        }
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      
 
     }
     
@@ -78,16 +66,10 @@ public class AccountHistoryController {
                 required = true, dataType = "string", paramType = "header")})
     public ResponseEntity<?> getEventTypes( HttpServletRequest httpServletRequest) {
         log.info("get history request");
-        JWT jwt = jwtService.getJWT(httpServletRequest);
-
-        if (jwt == null) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-        if ((jwt.hasRole(JWT.ROLE_USER)) || (jwt.hasRole(JWT.ROLE_ADMIN))) {
+      
             return ResponseEntity.ok(utilityService.getEventTypes());
 
-        }
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      
 
     }
     
@@ -102,13 +84,7 @@ public class AccountHistoryController {
         log.info("find {} ", request);
         request = setDefaults(request);
         log.info("find with defaults applied {} ", request);
-        JWT jwt = jwtService.getJWT(httpServletRequest);
-
-        if (jwt == null) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-
-        if ((jwt.hasRole(JWT.ROLE_USER)) || (jwt.hasRole(JWT.ROLE_ADMIN))) {
+      
             return ResponseEntity.ok(accountHistoryService.findByTimestampBetweenAndEventTypeAndAccountIdAndEventType(request.getPage(),
                     request.getPageSize(),
                     request.getSortBy(), request.getStartDate(), request.getEndDate(),
@@ -116,11 +92,15 @@ public class AccountHistoryController {
                     request.getAccountIds()
             ));
 
-        }
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    
 
     }
 
+    /**
+     * set default values for paged event history
+     * @param request
+     * @return 
+     */
     private PagedEventHistoryRequest setDefaults(PagedEventHistoryRequest request) {
         // set a default start date if not present
         if (request.getStartDate() == null) {
